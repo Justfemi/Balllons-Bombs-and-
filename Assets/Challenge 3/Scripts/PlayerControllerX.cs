@@ -5,9 +5,11 @@ using UnityEngine;
 public class PlayerControllerX : MonoBehaviour
 {
     public bool gameOver;
+    // public bool isLowEnough;
 
     public float floatForce;
     private float gravityModifier = 1.5f;
+    // private float upperBound = 15.0f;
     private Rigidbody playerRb;
 
     public ParticleSystem explosionParticle;
@@ -16,12 +18,14 @@ public class PlayerControllerX : MonoBehaviour
     private AudioSource playerAudio;
     public AudioClip moneySound;
     public AudioClip explodeSound;
+    public AudioClip bounceSound;
 
 
     // Start is called before the first frame update
     void Start()
     {
         Physics.gravity *= gravityModifier;
+        playerRb = GetComponent<Rigidbody>();
         playerAudio = GetComponent<AudioSource>();
 
         // Apply a small upward force at the start of the game
@@ -32,10 +36,17 @@ public class PlayerControllerX : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // if(transform.position.y > upperBound)
+        // {
+        //     isLowEnough = false;
+        // } else 
+        // {
+        //     isLowEnough = true;
+        // }
         // While space is pressed and player is low enough, float up
-        if (Input.GetKey(KeyCode.Space) && !gameOver)
+        if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
         {
-            playerRb.AddForce(Vector3.up * floatForce);
+            playerRb.AddForce(Vector3.up * floatForce/ 1.5f, ForceMode.Impulse);
         }
     }
 
@@ -45,7 +56,7 @@ public class PlayerControllerX : MonoBehaviour
         if (other.gameObject.CompareTag("Bomb"))
         {
             explosionParticle.Play();
-            playerAudio.PlayOneShot(explodeSound, 1.0f);
+            playerAudio.PlayOneShot(explodeSound, 0.6f);
             gameOver = true;
             Debug.Log("Game Over!");
             Destroy(other.gameObject);
@@ -55,10 +66,14 @@ public class PlayerControllerX : MonoBehaviour
         else if (other.gameObject.CompareTag("Money"))
         {
             fireworksParticle.Play();
-            playerAudio.PlayOneShot(moneySound, 1.0f);
+            playerAudio.PlayOneShot(moneySound, 0.4f);
             Destroy(other.gameObject);
+        } else if (other.gameObject.CompareTag("Ground") && !gameOver)
+        {
+            playerRb.AddForce(Vector3.up * floatForce ,ForceMode.Impulse);
+            playerAudio.PlayOneShot(bounceSound, 0.5f);
         }
-
+        
     }
 
 }
