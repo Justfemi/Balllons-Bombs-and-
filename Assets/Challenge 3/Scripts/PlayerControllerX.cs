@@ -5,11 +5,10 @@ using UnityEngine;
 public class PlayerControllerX : MonoBehaviour
 {
     public bool gameOver;
-    // public bool isLowEnough;
 
     public float floatForce;
     private float gravityModifier = 1.5f;
-    // private float upperBound = 15.0f;
+    private float upperBound = 13.5f;
     private Rigidbody playerRb;
 
     public ParticleSystem explosionParticle;
@@ -43,10 +42,15 @@ public class PlayerControllerX : MonoBehaviour
         // {
         //     isLowEnough = true;
         // }
+        if (transform.position.y >= upperBound)
+        {
+            transform.position = new Vector3(transform.position.x, upperBound, 0);
+        }
         // While space is pressed and player is low enough, float up
         if (Input.GetKeyDown(KeyCode.Space) && !gameOver)
         {
             playerRb.AddForce(Vector3.up * floatForce/ 1.5f, ForceMode.Impulse);
+            Debug.Log("Space bar down");
         }
     }
 
